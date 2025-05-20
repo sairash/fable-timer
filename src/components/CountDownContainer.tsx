@@ -27,6 +27,10 @@ const CountDownContainer = () => {
                 </div>
                 <button onClick={increaseTime} className="p-2 rounded bg-gray-200 text-black cursor-pointer">+</button>
             </div>
+
+            <div className="text-center mt-10">
+                Focus Timer
+            </div>
         </div>
     )
 }
