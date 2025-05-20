@@ -1,0 +1,9 @@
+/* Font from:  https://www.dafont.com/coffee-spark.font */
+@font-face {
+    font-family: 'cartoon';
+    src: URL('/Coffee-Spark.ttf') format('truetype');
+}
+
+.cartoon {
+    font-family: 'cartoon';
+}
