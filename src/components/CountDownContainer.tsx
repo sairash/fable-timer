@@ -17,17 +17,16 @@ const CountDownContainer = ({tick}:{tick: (data:number)=>void}) => {
     }
 
     return (
-        <>
-            <div className="flex gap-10">
-                <div className="p-2 min-w-64 text-7xl">
+        <div className="min-w-xs">
+            <div className="text-center mb-5 text-xl">
+                Focus Timer
+            </div>
+            <div className="flex justify-center p-2 w-full h-full">
+                <div className="p-2 text-7xl">
                     <CountDownTimer tick={tick} time={time} />
                 </div>
             </div>
-
-            <div className="text-center mt-10">
-                Focus Timer
-            </div>
-        </>
+        </div>
     )
 }
 

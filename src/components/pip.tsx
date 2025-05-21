@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import CountDownContainer from './CountDownContainer';
+import ControlButtons from './ControlButtons';
 
 
 
@@ -93,16 +94,16 @@ const PictureInPictureDiv = () => {
 
 
   return (
-    <div>
+    <div className='h-full w-full'>
       <div
         ref={divRef}
         style={{
           color: 'black',
-          backgroundColor: 'white',
         }}
-        className='bg-base p-20 w-md'
+        className='py-20 w-full h-full grid place-items-center'
       >
         <CountDownContainer tick={startPip} />
+        <ControlButtons />
       </div>
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
@@ -115,13 +116,13 @@ const PictureInPictureDiv = () => {
       />
 
       <br />
-      <button
+      {/* <button
         onClick={togglePiP}
         disabled={!isPiPSupported}
         style={{ marginTop: '20px' }}
       >
         {isPiPActive ? 'Close PiP' : 'Open PiP'}
-      </button>
+      </button> */}
 
       {!isPiPSupported && <p>Picture-in-Picture is not supported in your browser</p>}
     </div>

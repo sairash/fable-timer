@@ -35,6 +35,7 @@ const CountDownTimer = ({ time, tick }: CountDownTimer) => {
             const new_time = timeRemaining - 1000
             if (new_time <= 0) {
                 clearInterval(countdownInterval);
+                return
             }
 
             setTimeRemaining(new_time);

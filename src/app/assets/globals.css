@@ -5,5 +5,7 @@
 @theme {
   --color-base: white;
   --color-base-content: black;
+  --color-button-base: #808080;
+  --color-button-secondary: #999999;
 }
 
