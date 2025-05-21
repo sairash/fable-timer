@@ -1,8 +1,8 @@
-"use client"
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 
 interface CountDownTimer {
-    time: number
+    time: number,
+    tick: (data:number)=> void
 }
 
 const formatTime = (time: number) => {
@@ -23,7 +23,7 @@ const formatTime = (time: number) => {
 };
 
 
-const CountDownTimer = ({ time }: CountDownTimer) => {
+const CountDownTimer = ({ time, tick }: CountDownTimer) => {
     const [timeRemaining, setTimeRemaining] = useState(time );
 
     useEffect(() => {
@@ -32,11 +32,13 @@ const CountDownTimer = ({ time }: CountDownTimer) => {
 
     useEffect(() => {
         const countdownInterval = setInterval(() => {
-            if (timeRemaining - 1000 <= 0) {
+            const new_time = timeRemaining - 1000
+            if (new_time <= 0) {
                 clearInterval(countdownInterval);
             }
 
-            setTimeRemaining(timeRemaining - 1000);
+            setTimeRemaining(new_time);
+            tick(new_time);
         }, 1000);
 
         return () => clearInterval(countdownInterval);

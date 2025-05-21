@@ -1,8 +1,10 @@
-"use client"
+"use client";
 
 import { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import CountDownContainer from './CountDownContainer';
+
+
 
 const PictureInPictureDiv = () => {
   const divRef = useRef<HTMLDivElement>(null);
@@ -10,62 +12,21 @@ const PictureInPictureDiv = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPiPSupported, setIsPiPSupported] = useState(false);
   const [isPiPActive, setIsPiPActive] = useState(false);
+  const animationFrameRef = useRef<number>(0);
+
+  const handlePiPClose = () => setIsPiPActive(false);
 
   useEffect(() => {
     setIsPiPSupported('pictureInPictureEnabled' in document);
-
+    
     const div = divRef.current;
-    const canvas = canvasRef.current;
     const video = videoRef.current;
-
-    if (!div || !canvas || !video) return;
-
-    let animationFrameId: number;
-    let isMounted = true;
-
-    const captureAndUpdate = async () => {
-      if (!isMounted) return;
-
-      try {
-        // take div and make it into canvas and then convert it into video (magic)
-        const capturedCanvas = await html2canvas(div);
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        canvas.width = capturedCanvas.width;
-        canvas.height = capturedCanvas.height;
-        ctx.drawImage(capturedCanvas, 0, 0);
-
-        // ~10fps throttle becuase it's just timer
-        setTimeout(() => {
-          animationFrameId = requestAnimationFrame(captureAndUpdate);
-        }, 100);
-      } catch (error) {
-        console.error('Error capturing div:', error);
-      }
-    };
-
-    // loop it
-    captureAndUpdate();
-
-    return () => {
-      isMounted = false;
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!div || !video || !canvas) return;
 
-    // 10 FPS Because timer :)
-    const stream = canvas.captureStream(10); 
-    video.srcObject = stream;
-    video.play();
+    canvas.width = div.clientWidth;
+    canvas.height = div.clientHeight;
 
-    const handlePiPClose = () => setIsPiPActive(false);
     video.addEventListener('leavepictureinpicture', handlePiPClose);
 
     return () => {
@@ -73,41 +34,87 @@ const PictureInPictureDiv = () => {
     };
   }, []);
 
+  const startPip = () => {
+    setTimeout(async()=>{
+      if(!isPiPActive) return
+      const div = divRef.current;
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+
+      if (!div || !canvas || !video) return;
+
+      try {
+        const capturedCanvas = await html2canvas(div, {
+          logging: false,
+          useCORS: true,
+          allowTaint: false,
+        });
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        if (!ctx) return;
+        canvas.width = capturedCanvas.width;
+        canvas.height = capturedCanvas.height;
+        ctx.drawImage(capturedCanvas, 0, 0);
+      } catch (error) {
+        console.error('Error capturing div:', error);
+      }
+    }, 100)
+  };
+
   const togglePiP = async () => {
+    const canvas = canvasRef.current;
     const video = videoRef.current;
-    if (!video || !isPiPSupported) return;
+    if (!video || !isPiPSupported || !canvas) return;
 
     try {
       if (!document.pictureInPictureElement) {
-        await video.requestPictureInPicture();
         setIsPiPActive(true);
+        startPip();
+
+        const stream = canvas.captureStream(1); 
+        video.srcObject = stream;
+
+        await new Promise<void>((resolve) => {
+          video.addEventListener('loadedmetadata', () => resolve(), { once: true });
+        });
+
+        await video.play();
+        await video.requestPictureInPicture();
       } else {
+        cancelAnimationFrame(animationFrameRef.current);
         await document.exitPictureInPicture();
         setIsPiPActive(false);
       }
     } catch (error) {
-      console.error('PiP failed:', error);
+        setIsPiPActive(false);
+        console.error('PiP failed:', error);
     }
   };
+
+
 
   return (
     <div>
       <div
         ref={divRef}
         style={{
-          color: 'white',
-          backgroundColor: 'red'
+          color: 'black',
+          backgroundColor: 'white',
         }}
-        className='bg-base p-20 w-md '
+        className='bg-base p-20 w-md'
       >
-        <CountDownContainer />
+        <CountDownContainer tick={startPip} />
       </div>
 
-    
       <canvas ref={canvasRef} style={{ display: 'none' }} />
-      <video ref={videoRef} style={{ display: 'none' }} muted />
+      <video
+        playsInline
+        crossOrigin="anonymous"
+        ref={videoRef}
+        style={{ display: 'none' }}
+        muted
+      />
 
-      
+      <br />
       <button
         onClick={togglePiP}
         disabled={!isPiPSupported}
@@ -116,11 +123,10 @@ const PictureInPictureDiv = () => {
         {isPiPActive ? 'Close PiP' : 'Open PiP'}
       </button>
 
-      {!isPiPSupported && (
-        <p>Picture-in-Picture is not supported in your browser</p>
-      )}
+      {!isPiPSupported && <p>Picture-in-Picture is not supported in your browser</p>}
     </div>
   );
 };
+
 
 export default PictureInPictureDiv;
