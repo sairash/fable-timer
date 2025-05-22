@@ -3,6 +3,8 @@
 import PictureInPictureDiv from "@/components/pip";
 import { useState } from "react";
 import PausePlayFadeEffect from "./pausePlayFadeEffect";
+import OnlineUser from "./OnlineUsers";
+
 
 export default function ClientHomeView() {
     
@@ -21,6 +23,7 @@ export default function ClientHomeView() {
                 <img src={timeNotTicking?'/16377/386049.gif': '/16377/idle.gif'} className="w-96" />
             </div>
             <PausePlayFadeEffect isPlaying={timeNotTicking} />
+            <OnlineUser />
         </div>
     );
 }
