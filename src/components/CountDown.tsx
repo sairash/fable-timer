@@ -1,8 +1,9 @@
-import  { useState, useEffect } from "react";
+import  { useState, useEffect, useRef } from "react";
 
 interface CountDownTimer {
     time: number,
-    tick: (data:number)=> void
+    tick: (data:number)=> void,
+    play: boolean
 }
 
 const formatTime = (time: number) => {
@@ -23,26 +24,43 @@ const formatTime = (time: number) => {
 };
 
 
-const CountDownTimer = ({ time, tick }: CountDownTimer) => {
-    const [timeRemaining, setTimeRemaining] = useState(time );
+const CountDownTimer = ({ time, tick, play }: CountDownTimer) => {
+    const [timeRemaining, setTimeRemaining] = useState(time);
+    const countdownTimer = useRef<NodeJS.Timeout>(null);
 
     useEffect(() => {
         setTimeRemaining(time)
     }, [time])
 
+
+    useEffect(()=>{ 
+        if(play) {
+            countdownTimer.current = setTimeout(() => {
+                const new_time = timeRemaining - 1000
+                if (new_time <= 0) {
+                    clearCountdown();
+                    return
+                }
+    
+                setTimeRemaining(new_time);
+                tick(new_time);
+            }, 1000);
+        }else{
+            clearCountdown()
+        }
+    }, [play, timeRemaining])
+
+    function clearCountdown(){
+        if(!countdownTimer.current) return;
+        clearTimeout(countdownTimer.current);
+    }
+
     useEffect(() => {
-        const countdownInterval = setInterval(() => {
-            const new_time = timeRemaining - 1000
-            if (new_time <= 0) {
-                clearInterval(countdownInterval);
-                return
-            }
+        
 
-            setTimeRemaining(new_time);
-            tick(new_time);
-        }, 1000);
-
-        return () => clearInterval(countdownInterval);
+        return () => {
+            clearCountdown();
+        };
     }, [timeRemaining])
 
     return (

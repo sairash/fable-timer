@@ -5,7 +5,44 @@
 @theme {
   --color-base: white;
   --color-base-content: black;
-  --color-button-base: #808080;
+  --color-button-base-hover: rgba(128, 128, 128, 0.5);
   --color-button-secondary: #999999;
 }
 
+
+
+@-webkit-keyframes fadeOut {
+  0% { opacity: 0.5;}
+  99% { opacity: 0.01;}
+  100% { opacity: 0;}
+}  
+@keyframes fadeOut {
+  0% { opacity: 0.5;}
+  99% { opacity: 0.01;}
+  100% { opacity: 0;}
+}
+
+.fade-out{
+  display: block;
+  -webkit-animation: fadeOut 1s;
+  animation: fadeOut 1s;
+  animation-fill-mode: forwards;
+}
+
+@-webkit-keyframes fadeIn {
+  0% { opacity: 0;}
+  99% { opacity: 0.75;}
+  100% { opacity: 0.8;}
+}  
+@keyframes fadeIn {
+  0% { opacity: 0;}
+  99% { opacity: 0.75;}
+  100% { opacity: 0.8;}
+}
+
+.fade-in{
+  display: block;
+  -webkit-animation: fadeIn 2s;
+  animation: fadeIn 2s;
+  animation-fill-mode: forwards;
+}

@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import CountDownContainer from './CountDownContainer';
@@ -7,19 +5,49 @@ import ControlButtons from './ControlButtons';
 
 
 
-const PictureInPictureDiv = () => {
+const PictureInPictureDiv = ({play}:{play:() => void}) => {
   const divRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPiPSupported, setIsPiPSupported] = useState(false);
   const [isPiPActive, setIsPiPActive] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const [curButtonState, setCurButtonState] = useState<string[]>([
+    "play","music","","picture-in-picture"
+  ]);
+
   const animationFrameRef = useRef<number>(0);
 
   const handlePiPClose = () => setIsPiPActive(false);
 
+  useEffect(()=>{
+    if(isPiPActive){
+      setCurButtonState([curButtonState[0], curButtonState[1], curButtonState[2],"picture-in-picture-open"])
+    }else{
+      setCurButtonState([curButtonState[0], curButtonState[1], curButtonState[2],"picture-in-picture"])
+    }
+  }, [isPiPActive])
+
+  function toggleTimePlay(){
+
+    setIsPlaying(prev => !prev)
+
+  }
+
+  useEffect(()=>{
+    play();
+    if(!isPlaying){
+      setCurButtonState(["play", curButtonState[1], curButtonState[2],curButtonState[3]])
+    }else{
+      setCurButtonState(["pause", curButtonState[1], curButtonState[2],curButtonState[3]])
+    }
+  }, [isPlaying])
+
+
   useEffect(() => {
     setIsPiPSupported('pictureInPictureEnabled' in document);
-    
+
     const div = divRef.current;
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -36,8 +64,8 @@ const PictureInPictureDiv = () => {
   }, []);
 
   const startPip = () => {
-    setTimeout(async()=>{
-      if(!isPiPActive) return
+    setTimeout(async () => {
+      if (!isPiPActive) return
       const div = divRef.current;
       const canvas = canvasRef.current;
       const video = videoRef.current;
@@ -58,7 +86,7 @@ const PictureInPictureDiv = () => {
       } catch (error) {
         console.error('Error capturing div:', error);
       }
-    }, 100)
+    }, 10)
   };
 
   const togglePiP = async () => {
@@ -71,7 +99,7 @@ const PictureInPictureDiv = () => {
         setIsPiPActive(true);
         startPip();
 
-        const stream = canvas.captureStream(1); 
+        const stream = canvas.captureStream(1);
         video.srcObject = stream;
 
         await new Promise<void>((resolve) => {
@@ -86,24 +114,39 @@ const PictureInPictureDiv = () => {
         setIsPiPActive(false);
       }
     } catch (error) {
-        setIsPiPActive(false);
-        console.error('PiP failed:', error);
+      setIsPiPActive(false);
+      console.error('PiP failed:', error);
     }
   };
+
+  function btnEvent(data: string, close: boolean) {
+    switch (data) {
+      case "pip":
+        togglePiP();
+        break;
+        case "play":
+        console.log(data)
+        toggleTimePlay();
+      default:
+        break;
+    }
+  }
 
 
 
   return (
     <div className='h-full w-full'>
-      <div
-        ref={divRef}
-        style={{
-          color: 'black',
-        }}
-        className='py-20 w-full h-full grid place-items-center'
-      >
-        <CountDownContainer tick={startPip} />
-        <ControlButtons />
+      <div className="grid place-items-center h-full w-full">
+        <div
+          ref={divRef}
+          style={{
+            color: 'black',
+          }}
+          className='py-20 '
+        >
+          <CountDownContainer play={isPlaying} tick={startPip} />
+        </div>
+        <ControlButtons btnEvent={btnEvent} activeButtons={curButtonState} />
       </div>
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
