@@ -2,10 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import CountDownContainer from './CountDownContainer';
 import ControlButtons from './ControlButtons';
+import useMusicModalStore from '@/store/musicStore';
 
 
 
 const PictureInPictureDiv = ({play}:{play:() => void}) => {
+    const {toggle} = useMusicModalStore();
+
+
+
   const divRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -119,14 +124,23 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
     }
   };
 
+
+  function openMusic(){
+    toggle()
+  }
+
   function btnEvent(data: string, close: boolean) {
+    console.log(data)
     switch (data) {
       case "pip":
         togglePiP();
         break;
-        case "play":
-        console.log(data)
+      case "play":
         toggleTimePlay();
+        break;
+      case "music":
+        openMusic()
+        break;
       default:
         break;
     }
