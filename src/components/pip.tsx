@@ -16,6 +16,7 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPiPSupported, setIsPiPSupported] = useState(false);
   const [isPiPActive, setIsPiPActive] = useState(false);
+  const [activatingPip, setActivatingPip] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const [curButtonState, setCurButtonState] = useState<string[]>([
@@ -94,7 +95,7 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
     }, 10)
   };
 
-  const togglePiP = async () => {
+  const togglePiPInnerFunction = async () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
     if (!video || !isPiPSupported || !canvas) return;
@@ -124,6 +125,16 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
     }
   };
 
+  useEffect(()=>{
+    togglePiPInnerFunction()
+  }, [activatingPip])
+
+
+  function togglePip(){
+    setActivatingPip(prev => !prev)
+  }
+
+
 
   function openMusic(){
     toggle()
@@ -133,7 +144,7 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
     console.log(data)
     switch (data) {
       case "pip":
-        togglePiP();
+        togglePip();
         break;
       case "play":
         toggleTimePlay();
