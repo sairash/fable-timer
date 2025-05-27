@@ -11,11 +11,11 @@ const CountDownContainer = () => {
     }, [])
 
     return (
-        <div className="min-w-xs">
-            <div className="text-center mb-5 text-2xl">
+        <div className="min-w-xs ">
+            <div className="text-center mb-5 text-4xl">
                 Focus Timer
             </div>
-            <div className="flex justify-center p-2 w-full h-full">
+            <div className="flex justify-center p-2 w-full h-full school">
                 <div className="p-2 text-7xl">
                     <CountDownTimer />
                 </div>

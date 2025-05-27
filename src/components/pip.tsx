@@ -7,7 +7,7 @@ import useTimeStore from '@/store/timeStore';
 
 
 
-const PictureInPictureDiv = ({ play }: { play: () => void }) => {
+const PictureInPictureDiv = () => {
   const { toggle } = useMusicModalStore();
   const { timeStamp, ticking, toggleTicking } = useTimeStore()
 
@@ -20,7 +20,7 @@ const PictureInPictureDiv = ({ play }: { play: () => void }) => {
   const [activatingPip, setActivatingPip] = useState(false);
 
   const [curButtonState, setCurButtonState] = useState<string[]>([
-    "play", "music", "", "picture-in-picture"
+    "play", "music", "settings", "picture-in-picture"
   ]);
 
   const animationFrameRef = useRef<number>(0);
@@ -63,7 +63,6 @@ const PictureInPictureDiv = ({ play }: { play: () => void }) => {
 
 
   useEffect(() => {
-    play();
     if (!ticking) {
       setCurButtonState(["play", curButtonState[1], curButtonState[2], curButtonState[3]])
     } else {

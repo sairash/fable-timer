@@ -1,39 +1,91 @@
-import { IconBeach, IconTree } from '@tabler/icons-react';
-import { ReactNode } from 'react';
-import { create } from 'zustand';
+import {
+    IconBeach,
+    IconCampfire, IconCloudFog, IconCloudStorm,
+    IconCup,
+    IconDroplet,
+    IconDropletFilled,
+    IconTree,
+    IconWind
+} from '@tabler/icons-react';
+import {ReactNode} from 'react';
+import {create} from 'zustand';
 
 
 interface Audios {
     title: string,
     desc: string,
-    musicUrl: string,
+    music: HTMLAudioElement | null 
     icon: ReactNode,
 }
 
 interface MusicModalState {
     open: boolean;
     active: string[];
-    audios: Audios[];
+    audios: Record<string, Audios>;
     toggle: () => void;
     toggleActive: (title: string) => void;
     isActive: (title: string) => boolean
 }
 
+const createAudioElement = (src: string): HTMLAudioElement | null => {
+    if (typeof window !== 'undefined') {
+        return Object.assign(new Audio(src), {
+            loop: true,
+            preload: 'auto'
+        });
+    }
+    return null;
+};
+
 const useMusicModalStore = create<MusicModalState>((set, get) => ({
     open: false,
     active: [],
-    audios: [{
-        title: "Beach",
-        desc: "Makes sound like beach.",
-        musicUrl: "https://hello.com",
-        icon: <IconBeach width={50} height={50} stroke={1.2} />
-    }, {
-        title: "Forrest",
-        desc: "Makes sounds like forrest",
-        musicUrl: "https://sadasdasd",
-        icon: <IconTree width={50} height={50} stroke={1.2} />
-    }],
-    toggle: () => set((state) => ({ open: !state.open })),
+    audios: {
+        "wind": {
+            title: "Wind",
+            desc: "Howling winds",
+            music: createAudioElement('https://akocdw82ai.ufs.sh/f/Jk6mQ2VBlE6toZgJnNnyciU06w7xkslLhGM2DZ3vBazQFypu'),
+            icon: <IconWind width={30} height={30} stroke={1.2}/>
+        },
+        "forrest": {
+            title: "Forrest",
+            desc: "Birds chirping and forest audio",
+            music: createAudioElement('https://akocdw82ai.ufs.sh/f/Jk6mQ2VBlE6tJRx9SAVBlE6tumDzfiKX2RrbsTLOPYUd4IV8'),
+            icon: <IconTree width={30} height={30} stroke={1.2}/>
+        },
+        "campfire": {
+            title: "Campfire",
+            desc: "Bonfire and wood burning",
+            music: createAudioElement('https://akocdw82ai.ufs.sh/f/Jk6mQ2VBlE6tcTEN9jajqaumdHJr2VfGkQSE9FveoltNhAM4'),
+            icon: <IconCampfire width={30} height={30} stroke={1.2}/>
+        },
+        "cafe": {
+            title: "Cafe",
+            desc: "A rustling cafe",
+            music: createAudioElement('https://akocdw82ai.ufs.sh/f/Jk6mQ2VBlE6to2Ate7yciU06w7xkslLhGM2DZ3vBazQFypuT'),
+            icon: <IconCup width={30} height={30} stroke={1.2}/>
+        },
+        "stream": {
+            title: "Stream",
+            desc: "River flowing down the stream",
+            music: createAudioElement('https://akocdw82ai.ufs.sh/f/Jk6mQ2VBlE6tYVbWUjLr5NPLfyHCAXTI0wcDOVaRt3j1qU7e'),
+            icon: <IconDropletFilled width={30} height={30} stroke={1.2}/>
+        },
+        "rain": {
+            title: "Rain",
+            desc: "Rain Sounds",
+            music: createAudioElement('https://akocdw82ai.ufs.sh/f/Jk6mQ2VBlE6tEQ8ZAz9CJBlGwtFz0fbUoaVK5EOIYLA3nv7k'),
+            icon: <IconCloudFog width={30} height={30} stroke={1.2}/>
+        },
+        "storm": {
+            title: "Storm",
+            desc: "Rain with some thunder.",
+            music: createAudioElement('https://akocdw82ai.ufs.sh/f/Jk6mQ2VBlE6tysQ7T1tCFTLsGa3mY8iJX6eSRWAn2HkNd70x'),
+            icon: <IconCloudStorm width={30} height={30} stroke={1.2}/>
+        }
+    },
+
+    toggle: () => set((state) => ({open: !state.open})),
     toggleActive: (title: string) => set((state) => ({
         active: state.active.includes(title)
             ? state.active.filter((t) => t !== title)

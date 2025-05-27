@@ -7,3 +7,12 @@
 .cartoon {
     font-family: 'cartoon';
 }
+
+@font-face {
+    font-family: 'school';
+    src: URL('/school.ttf') format('truetype');
+}
+
+.school {
+    font-family: 'school';
+}
