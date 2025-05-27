@@ -7,17 +7,13 @@ import OnlineUser from "./OnlineUsers";
 import Modal from "@/components/custom-ui/modal";
 import {IconBeach, IconMusic, IconPlayCard} from "@tabler/icons-react";
 import useMusicModalStore from "@/store/musicStore";
+import { cx } from "class-variance-authority";
 
 
 export default function ClientHomeView() {
 
-    const {open, active, audios, setActive, isActive, toggle} = useMusicModalStore();
+    const {open, audios, toggleActive, isActive, toggle} = useMusicModalStore();
 
-    useEffect(()=>{
-        if(active.length == 0){
-            setActive("Beach")
-        }
-    }, [active])
     
     const [timeNotTicking, setTimeNotTicking] = useState(true)
 
@@ -40,9 +36,12 @@ export default function ClientHomeView() {
             <PausePlayFadeEffect isPlaying={timeNotTicking} />
             <OnlineUser />
             {open && (<Modal title="Music" close={toggleMusic}>
-                {audios.map((element, index) => (
-                    <div key={element.title} className="p-2 cursor-pointer rounded hover:bg-amber-100 flex my-2 bg-gray-100">
-                        <div className="w-[50px] h-[50px]">
+                {audios.map((element) => (
+                    <div onClick={()=>{toggleActive(element.title)}} key={element.title} className={cx({
+                        'p-2 cursor-pointer rounded flex my-2 hover:bg-amber-100 bg-gray-100': true,
+                        'bg-gray-200': isActive(element.title)
+                    })}>
+                        <div className="w-[50px] h-[50px] bg-white rounded">
                             {element.icon}
                         </div>
                         <div className="px-2 w-full">

@@ -1,4 +1,4 @@
-import { IconBeach } from '@tabler/icons-react';
+import { IconBeach, IconTree } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { create } from 'zustand';
 
@@ -15,7 +15,7 @@ interface MusicModalState {
     active: string[];
     audios: Audios[];
     toggle: () => void;
-    setActive: (title: string) => void;
+    toggleActive: (title: string) => void;
     isActive: (title: string) => boolean
 }
 
@@ -26,10 +26,15 @@ const useMusicModalStore = create<MusicModalState>((set, get) => ({
         title: "Beach",
         desc: "Makes sound like beach.",
         musicUrl: "https://hello.com",
-        icon: <IconBeach width={50} height={50} stroke={1.2} className="bg-gray-100 p-1 rounded" />
+        icon: <IconBeach width={50} height={50} stroke={1.2} />
+    }, {
+        title: "Forrest",
+        desc: "Makes sounds like forrest",
+        musicUrl: "https://sadasdasd",
+        icon: <IconTree width={50} height={50} stroke={1.2} />
     }],
     toggle: () => set((state) => ({ open: !state.open })),
-    setActive: (title: string) => set((state) => ({
+    toggleActive: (title: string) => set((state) => ({
         active: state.active.includes(title)
             ? state.active.filter((t) => t !== title)
             : [...state.active, title]
