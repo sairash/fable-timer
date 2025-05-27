@@ -104,8 +104,13 @@ const ControlButtons = ({ btnEvent, activeButtons }: { btnEvent: (data: string, 
         document.addEventListener("keydown", (ev) => {
             switch (ev.code) {
                 case "Space":
-                    btnEvent("play", true)
+                    btnEvent("play", true);
                     break;
+                case "KeyM":
+                    btnEvent("music", false);
+                    break;
+                case "KeyP":
+                    btnEvent("pip", false)
                 default:
                     break;
             }
