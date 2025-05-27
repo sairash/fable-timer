@@ -3,12 +3,13 @@ import html2canvas from 'html2canvas';
 import CountDownContainer from './CountDownContainer';
 import ControlButtons from './ControlButtons';
 import useMusicModalStore from '@/store/musicStore';
+import useTimeStore from '@/store/timeStore';
 
 
 
-const PictureInPictureDiv = ({play}:{play:() => void}) => {
-    const {toggle} = useMusicModalStore();
-
+const PictureInPictureDiv = ({ play }: { play: () => void }) => {
+  const { toggle } = useMusicModalStore();
+  const { timeStamp, ticking, toggleTicking } = useTimeStore()
 
 
   const divRef = useRef<HTMLDivElement>(null);
@@ -17,38 +18,15 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
   const [isPiPSupported, setIsPiPSupported] = useState(false);
   const [isPiPActive, setIsPiPActive] = useState(false);
   const [activatingPip, setActivatingPip] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   const [curButtonState, setCurButtonState] = useState<string[]>([
-    "play","music","","picture-in-picture"
+    "play", "music", "", "picture-in-picture"
   ]);
 
   const animationFrameRef = useRef<number>(0);
 
   const handlePiPClose = () => setIsPiPActive(false);
 
-  useEffect(()=>{
-    if(isPiPActive){
-      setCurButtonState([curButtonState[0], curButtonState[1], curButtonState[2],"picture-in-picture-open"])
-    }else{
-      setCurButtonState([curButtonState[0], curButtonState[1], curButtonState[2],"picture-in-picture"])
-    }
-  }, [isPiPActive])
-
-  function toggleTimePlay(){
-
-    setIsPlaying(prev => !prev)
-
-  }
-
-  useEffect(()=>{
-    play();
-    if(!isPlaying){
-      setCurButtonState(["play", curButtonState[1], curButtonState[2],curButtonState[3]])
-    }else{
-      setCurButtonState(["pause", curButtonState[1], curButtonState[2],curButtonState[3]])
-    }
-  }, [isPlaying])
 
 
   useEffect(() => {
@@ -68,6 +46,30 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
       video.removeEventListener('leavepictureinpicture', handlePiPClose);
     };
   }, []);
+
+  useEffect(() => {
+    startPip()
+  }, [timeStamp])
+
+
+
+  useEffect(() => {
+    if (isPiPActive) {
+      setCurButtonState([curButtonState[0], curButtonState[1], curButtonState[2], "picture-in-picture-open"])
+    } else {
+      setCurButtonState([curButtonState[0], curButtonState[1], curButtonState[2], "picture-in-picture"])
+    }
+  }, [isPiPActive])
+
+
+  useEffect(() => {
+    play();
+    if (!ticking) {
+      setCurButtonState(["play", curButtonState[1], curButtonState[2], curButtonState[3]])
+    } else {
+      setCurButtonState(["pause", curButtonState[1], curButtonState[2], curButtonState[3]])
+    }
+  }, [ticking])
 
   const startPip = () => {
     setTimeout(async () => {
@@ -94,6 +96,8 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
       }
     }, 10)
   };
+
+
 
   const togglePiPInnerFunction = async () => {
     const canvas = canvasRef.current;
@@ -125,18 +129,18 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     togglePiPInnerFunction()
   }, [activatingPip])
 
 
-  function togglePip(){
+  function togglePip() {
     setActivatingPip(prev => !prev)
   }
 
 
 
-  function openMusic(){
+  function openMusic() {
     toggle()
   }
 
@@ -147,7 +151,7 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
         togglePip();
         break;
       case "play":
-        toggleTimePlay();
+        toggleTicking();
         break;
       case "music":
         openMusic()
@@ -169,7 +173,7 @@ const PictureInPictureDiv = ({play}:{play:() => void}) => {
           }}
           className='py-20 '
         >
-          <CountDownContainer play={isPlaying} tick={startPip} />
+          <CountDownContainer />
         </div>
         <ControlButtons btnEvent={btnEvent} activeButtons={curButtonState} />
       </div>

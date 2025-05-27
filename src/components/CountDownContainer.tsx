@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
 import CountDownTimer from "./CountDown";
+import useTimeStore from "@/store/timeStore";
 
-const CountDownContainer = ({tick, play}:{tick: (data:number)=>void, play:boolean}) => {
-    const [time, setTime] = useState(12 * 60 * 1000);
+const CountDownContainer = () => {
 
-    useEffect(() => {
-        console.log(time)
-    }, [time])
+    const {setTimeStamp}= useTimeStore();
+
+    useEffect(()=>{
+        setTimeStamp(12 * 60 * 1000);
+    }, [])
 
     return (
         <div className="min-w-xs">
@@ -15,7 +17,7 @@ const CountDownContainer = ({tick, play}:{tick: (data:number)=>void, play:boolea
             </div>
             <div className="flex justify-center p-2 w-full h-full">
                 <div className="p-2 text-7xl">
-                    <CountDownTimer tick={tick} play={play} time={time} />
+                    <CountDownTimer />
                 </div>
             </div>
         </div>

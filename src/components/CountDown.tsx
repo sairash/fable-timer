@@ -1,10 +1,7 @@
+import useTimeStore from "@/store/timeStore";
 import  { useState, useEffect, useRef } from "react";
 
-interface CountDownTimer {
-    time: number,
-    tick: (data:number)=> void,
-    play: boolean
-}
+
 
 const formatTime = (time: number) => {
     const seconds = Math.floor((time / 1000) % 60);
@@ -24,31 +21,28 @@ const formatTime = (time: number) => {
 };
 
 
-const CountDownTimer = ({ time, tick, play }: CountDownTimer) => {
-    const [timeRemaining, setTimeRemaining] = useState(time);
-    const countdownTimer = useRef<NodeJS.Timeout>(null);
+const CountDownTimer = () => {
 
-    useEffect(() => {
-        setTimeRemaining(time)
-    }, [time])
+    const {timeStamp, setTimeStamp, ticking} = useTimeStore();
+
+    const countdownTimer = useRef<NodeJS.Timeout>(null);
 
 
     useEffect(()=>{ 
-        if(play) {
+        if(ticking) {
             countdownTimer.current = setTimeout(() => {
-                const new_time = timeRemaining - 1000
+                const new_time = timeStamp - 1000
                 if (new_time <= 0) {
                     clearCountdown();
                     return
                 }
     
-                setTimeRemaining(new_time);
-                tick(new_time);
+                setTimeStamp(new_time);
             }, 1000);
         }else{
             clearCountdown()
         }
-    }, [play, timeRemaining])
+    }, [ticking, timeStamp])
 
     function clearCountdown(){
         if(!countdownTimer.current) return;
@@ -61,11 +55,11 @@ const CountDownTimer = ({ time, tick, play }: CountDownTimer) => {
         return () => {
             clearCountdown();
         };
-    }, [timeRemaining])
+    }, [timeStamp])
 
     return (
         <div className="">
-            {formatTime(timeRemaining)}
+            {formatTime(timeStamp)}
         </div>
     )
 }

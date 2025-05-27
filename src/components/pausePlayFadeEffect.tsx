@@ -26,7 +26,7 @@ const PausePlayFadeEffect = ({isPlaying}: {isPlaying: boolean}) => {
     return (
         <>
             {!isHidden && <div className='fade-out fixed top-[50%] left-[50%] opacity-50' style={{transform: `translate(-50%, -50%)`}}>
-                <div className="bg-button-base-hover p-2 rounded-full cursor-pointer">
+                <div className="bg-button-base-hover shadow-2xl p-2 rounded-full cursor-pointer">
                     
                     {!isPlaying?
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-26 h-26" viewBox="0 0 32 32" version="1.1">
@@ -46,7 +46,7 @@ const PausePlayFadeEffect = ({isPlaying}: {isPlaying: boolean}) => {
             </div>}
 
             {
-                !isPlaying && <div className="fade-in bg-button-base-hover py-2 px-4 fixed top-5 rounded left-[50%] font-semibold opacity-80" style={{transform: `translateX(-50%)`}}>Paused </div>
+                !isPlaying && <div className="fade-in bg-gradient-to-r from-amber-400 to-amber-500 shadow-xl py-2 px-4 fixed top-5 rounded left-[50%] font-semibold text-white" style={{transform: `translateX(-50%)`}}>Paused </div>
             }
         </>
     )
