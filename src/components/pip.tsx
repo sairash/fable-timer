@@ -4,12 +4,14 @@ import CountDownContainer from './CountDownContainer';
 import ControlButtons from './ControlButtons';
 import useMusicModalStore from '@/store/musicStore';
 import useTimeStore from '@/store/timeStore';
+import useSettingsStore from '@/store/settingsStore';
 
 
 
 const PictureInPictureDiv = () => {
   const { toggle } = useMusicModalStore();
   const { timeStamp, ticking, toggleTicking } = useTimeStore()
+  const settingsStore = useSettingsStore();
 
 
   const divRef = useRef<HTMLDivElement>(null);
@@ -154,6 +156,9 @@ const PictureInPictureDiv = () => {
         break;
       case "music":
         openMusic()
+        break;
+      case "settings":
+        settingsStore.toggle();
         break;
       default:
         break;

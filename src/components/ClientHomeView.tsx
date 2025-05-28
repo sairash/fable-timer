@@ -6,6 +6,7 @@ import PausePlayFadeEffect from "./pausePlayFadeEffect";
 import OnlineUser from "./OnlineUsers";
 import MusicModal from "@/components/music"
 import useTimeStore from "@/store/timeStore";
+import Settings from "./settings";
 
 
 export default function ClientHomeView() {
@@ -22,6 +23,7 @@ export default function ClientHomeView() {
             <PausePlayFadeEffect isPlaying={ticking} />
             <OnlineUser />
             <MusicModal />
+            <Settings />
         </div>
     );
 }
