@@ -12,13 +12,13 @@ import {
 import useMusicModalStore from "@/store/musicStore";
 import Modal from "@/components/custom-ui/modal";
 import { useEffect, useState } from "react";
+import useTimeStore from "@/store/timeStore";
 
 
 
 function MusicModal() {
-    const { open, audios, active, toggleActive, isActive, toggle } = useMusicModalStore();
-    const [stopMusicOnTimerPause, setStopMusicOnTimerPause] = useState(true);
-
+    const { open, pauseWithTimer, togglePauseWithTimer, audios, active, toggleActive, isActive, toggle } = useMusicModalStore();
+    const {ticking} = useTimeStore();
 
     useEffect(() => {
         Object.entries(audios).forEach(([key, element]) => {
@@ -26,7 +26,7 @@ function MusicModal() {
             const audio = element.music;
 
             if (audio) {
-                if (isCurrentlyActive) {
+                if (isCurrentlyActive && !((!ticking && pauseWithTimer))) {
                     audio.play().catch(e => console.error("Error playing audio:", e));
                 } else {
                     audio.pause();
@@ -34,12 +34,12 @@ function MusicModal() {
                 }
             }
         });
-    }, [active, audios, isActive]);
+    }, [ticking, pauseWithTimer, active, audios, isActive]);
 
+    useEffect(()=>{
 
-    function toggleStopMusicOnTimerPause() {
-        setStopMusicOnTimerPause(!stopMusicOnTimerPause);
-    }
+    })
+
 
     function toggleMusic() {
         toggle()
@@ -53,17 +53,17 @@ function MusicModal() {
                         <Tooltip>
                             <TooltipTrigger>
                                 <div className="flex gap-2">
-                                    <label onClick={toggleStopMusicOnTimerPause}><IconClockPause size={20} /></label>
+                                    <label onClick={togglePauseWithTimer}><IconClockPause size={20} /></label>
                                     <Switch
                                         id="airplane-mode"
-                                        initialChecked={stopMusicOnTimerPause}
-                                        onCheckedChange={toggleStopMusicOnTimerPause}
+                                        initialChecked={pauseWithTimer}
+                                        onCheckedChange={togglePauseWithTimer}
                                         className="cursor-pointer"
                                     />
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent side="left" style={{ zIndex: 1000 }}>
-                                <p className="py-1">Pause on Timer Pause</p>
+                                <p className="py-1">Auto Pause with Timer</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -93,8 +93,6 @@ function MusicModal() {
                     </div>
                 ))}
             >
-
-
             </Modal>)}
         </>
     )

@@ -21,10 +21,12 @@ interface Audios {
 interface MusicModalState {
     open: boolean;
     active: string[];
+    pauseWithTimer: boolean,
     audios: Record<string, Audios>;
     toggle: () => void;
     toggleActive: (title: string) => void;
-    isActive: (title: string) => boolean
+    isActive: (title: string) => boolean;
+    togglePauseWithTimer: ()=>void;
 }
 
 const createAudioElement = (src: string): HTMLAudioElement | null => {
@@ -40,6 +42,7 @@ const createAudioElement = (src: string): HTMLAudioElement | null => {
 const useMusicModalStore = create<MusicModalState>((set, get) => ({
     open: false,
     active: [],
+    pauseWithTimer: true,
     audios: {
         "wind": {
             title: "Wind",
@@ -92,6 +95,9 @@ const useMusicModalStore = create<MusicModalState>((set, get) => ({
             : [...state.active, title]
     })),
     isActive: (title: string) => get().active.includes(title),
+    togglePauseWithTimer: () => set((state) => ({
+        pauseWithTimer: !state.pauseWithTimer,
+    }))
 }))
 
 export default useMusicModalStore;
