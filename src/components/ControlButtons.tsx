@@ -4,7 +4,8 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
+
 import {
     IconMusic,
     IconPictureInPicture,
@@ -130,11 +131,15 @@ const ControlButtons = ({ btnEvent, activeButtons }: { btnEvent: (data: string, 
 
 
     return (
-        <div className="flex gap-1 fixed bottom-10 left-[50%]" style={{ transform: `translateX(-50%)` }}>
-            {activeButtons.map((buttonType) => (
-                obj_button[buttonType]
-            ))}
-        </div>
+        <>
+            <div className="fixed bottom-10 left-[50%]" style={{ transform: `translateX(-50%)` }}>
+                <div className="flex justify-center gap-1">
+                    {activeButtons.map((buttonType) => (
+                        obj_button[buttonType]
+                    ))}
+                </div>
+            </div>
+        </>
     )
 };
 
