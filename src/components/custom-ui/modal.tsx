@@ -5,7 +5,7 @@ import {ReactNode, useCallback, useEffect} from "react";
 interface ModalProps {
     close: () => void;
     title: string;
-    headerContent: ReactNode; 
+    headerContent?: ReactNode; 
     bodyContent: ReactNode; 
 }
 
