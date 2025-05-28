@@ -1,7 +1,23 @@
-import {ReactNode} from "react";
+import {ReactNode, useCallback, useEffect} from "react";
 
 
 function modal({close, title, children}: {close: ()=>void, title: string, children: ReactNode}) {
+
+    const handleKeyDown = useCallback((event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            close();
+        }
+    }, []);
+
+    useEffect(()=>{
+
+       document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+
+    }, [])
 
     return (
         <>
