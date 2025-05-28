@@ -1,11 +1,24 @@
 import { cx } from "class-variance-authority";
-import {IconMusic} from "@tabler/icons-react";
+import { IconClockPause, IconMusic } from "@tabler/icons-react";
+import Switch from "@/components/custom-ui/Switch"
+
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import useMusicModalStore from "@/store/musicStore";
 import Modal from "@/components/custom-ui/modal";
-import {useEffect} from "react";
+import { useEffect, useState } from "react";
 
-function MusicModal(){
-    const {open, audios, active, toggleActive, isActive, toggle} = useMusicModalStore();
+
+
+function MusicModal() {
+    const { open, audios, active, toggleActive, isActive, toggle } = useMusicModalStore();
+    const [stopMusicOnTimerPause, setStopMusicOnTimerPause] = useState(true);
+
 
     useEffect(() => {
         Object.entries(audios).forEach(([key, element]) => {
@@ -17,11 +30,16 @@ function MusicModal(){
                     audio.play().catch(e => console.error("Error playing audio:", e));
                 } else {
                     audio.pause();
-                    audio.currentTime = 0; 
+                    audio.currentTime = 0;
                 }
             }
         });
-    }, [active, audios, isActive]); 
+    }, [active, audios, isActive]);
+
+
+    function toggleStopMusicOnTimerPause() {
+        setStopMusicOnTimerPause(!stopMusicOnTimerPause);
+    }
 
     function toggleMusic() {
         toggle()
@@ -29,9 +47,29 @@ function MusicModal(){
 
     return (
         <>
-            {open && (<Modal title="Music" close={toggleMusic}>
-                {Object.entries(audios).map(([key, element]) => (
-                    <div onClick={()=>{toggleActive(element.title)}} key={key} className={cx({
+            {open && (<Modal title="Music" close={toggleMusic}
+                headerContent={
+                    <TooltipProvider key="picture-in-picture">
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <div className="flex gap-2">
+                                    <label onClick={toggleStopMusicOnTimerPause}><IconClockPause size={20} /></label>
+                                    <Switch
+                                        id="airplane-mode"
+                                        initialChecked={stopMusicOnTimerPause}
+                                        onCheckedChange={toggleStopMusicOnTimerPause}
+                                        className="cursor-pointer"
+                                    />
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="left" style={{ zIndex: 1000 }}>
+                                <p className="py-1">Pause on Timer Pause</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                }
+                bodyContent={Object.entries(audios).map(([key, element]) => (
+                    <div onClick={() => { toggleActive(element.title) }} key={key} className={cx({
                         'p-2 cursor-pointer rounded flex my-2 hover:bg-amber-100 bg-gray-100': true,
                         'bg-gray-200': isActive(element.title)
                     })}>
@@ -54,6 +92,9 @@ function MusicModal(){
                         }
                     </div>
                 ))}
+            >
+
+
             </Modal>)}
         </>
     )
