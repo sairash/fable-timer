@@ -26,6 +26,10 @@ const useStickerStore = create<stickerStoreInterface>((set, get) => ({
         "21097": {
             id: "21097",
             name: "Fluffy Star",
+        },
+        "16503": {
+            id: "16503",
+            name: "Cute Dugong"
         }
     },
     activeId: "16377",
