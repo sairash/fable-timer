@@ -98,11 +98,11 @@ function MusicModal() {
                                     </button>
 
                                     <button
-                                        className="cursor-pointer h-7 w-7 rounded bg-black flex items-center justify-center text-white shadow-lg hover:shadow-purple-500/25 transform mx-1"
+                                        className="cursor-pointer rounded bg-black p-1 flex items-center justify-center text-white shadow-lg hover:shadow-purple-500/25 transform mx-1"
                                         onClick={() => setIsPlaying(!isPlaying)}
                                         aria-label={isPlaying ? "Pause" : "Play"}
                                     >
-                                        {isPlaying ? <IconPlayerPauseFilled className="h-3 w-3" /> : <IconPlayerPlayFilled className="h-3 w-3 ml-0.5" />}
+                                        {isPlaying ? <IconPlayerPauseFilled size={17} /> : <IconPlayerPlayFilled size={17} />}
                                     </button>
 
                                     <button
@@ -130,7 +130,7 @@ function MusicModal() {
             </div>
             {open && (<Modal title="Music" close={toggleMusic}
                 headerContent={
-                    <TooltipProvider key="picture-in-picture">
+                    <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger>
                                 <div className="flex gap-2">

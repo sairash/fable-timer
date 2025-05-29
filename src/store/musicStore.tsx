@@ -1,8 +1,6 @@
 import {
-    IconBeach,
     IconCampfire, IconCloudFog, IconCloudStorm,
     IconCup,
-    IconDroplet,
     IconDropletFilled,
     IconTree,
     IconWind
