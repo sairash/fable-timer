@@ -8,9 +8,8 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Textarea } from "./ui/textarea";
 import useStickerStore from "@/store/stickerStore";
-import { Key } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Settings() {
 
@@ -22,8 +21,14 @@ export default function Settings() {
         toggle()
     }
 
+    useEffect(()=>{
+        
+        setActiveId(localStorage.getItem("sticker_pack")??"16377")
+    }, [])
+
     function changeSticker(id: string) {
         setActiveId(id)
+        localStorage.setItem("sticker_pack", id)
     }
 
     return (
