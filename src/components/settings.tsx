@@ -1,23 +1,83 @@
 import Modal from "@/components/custom-ui/modal"
 import useSettingsStore from "@/store/settingsStore"
+import { IconInfoCircle } from "@tabler/icons-react";
+
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Textarea } from "./ui/textarea";
+import useStickerStore from "@/store/stickerStore";
+import { Key } from "lucide-react";
 
 export default function Settings() {
-    
-    const {open, toggle} = useSettingsStore();
+
+    const { open, toggle } = useSettingsStore();
+    const {stickers, activeId, setActiveId} = useStickerStore();
 
 
-    function close(){
+    function close() {
         toggle()
+    }
+
+    function changeSticker(id: string) {
+        setActiveId(id)
     }
 
     return (
         <>
             {open && <Modal title="Setting" close={close} bodyContent={
-                <div>
-                    <div className="font-semibold text-sm">Time: </div>
+                <div className="flex flex-col justify-center w-full h-full">
+                    <div className="">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <b className="flex gap-2 text-sm mb-1">Timer Sequence:
+                                        <IconInfoCircle size={17} className="mt-[1px] cursor-pointer" />
+                                    </b> 
+                                </TooltipTrigger>
+                                <TooltipContent side="right" style={{ zIndex: 1000 }}>
+                                    <p className="py-1 max-w-[200px]">Uses the <b>Pomodoro sequence:</b> Pomodoro → short break, repeat 4x, then one long break</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                        <div className="flex justify-between gap-2 w-full">
+                            <div className="w-full">
+                                <small className="font-semibold">Focus Timer</small>
+                                <input type="number" name="" id="" className="bg-gray-200 rounded p-1 w-full mt-1" />
+                                <small className="">minutes</small>
+                            </div>
+                            <div className="w-full">
+                                <small className="font-semibold">Short Breaks</small>
+                                <input type="number" name="" id="" className="bg-gray-200 rounded p-1 w-full mt-1" />
+                                <small className="">minutes</small>
+                            </div>
+                            <div className="w-full">
+                                <small className="font-semibold">Long Breaks</small>
+                                <input type="number" name="" id="" className="bg-gray-200 rounded p-1 w-full mt-1" />
+                                <small className="">minutes</small>
+                            </div>
+                        </div>
+                        <div className="mt-4 text-sm mb-2 font-semibold">Sticker Pack: </div>
+                        <div className="flex h-30">
+                            <img src={`/sticker/${activeId}/choose.gif`} className="w-30" alt="" />
+                            <div className="border-l border-gray-200 w-full p-2">
+                                <div className="text-sm">Choose A Pack:</div>
+                                <select onChange={(event)=>{
+                                    changeSticker(event.target.value)
+                                }} value={activeId} className="w-full mt-1 px-1 py-2 bg-gray-200">
+                                    {Object.entries(stickers).map(([key, value]) => (
+                                        value.id == activeId? <option key={key} id={key} value={value.id}>{value.name}</option>:<option key={key} id={key} value={value.id}>{value.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             }>
-                
+
             </Modal>}
         </>
     )
