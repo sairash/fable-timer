@@ -9,10 +9,11 @@ interface timeStamp {
     toggleTicking: () => void;
     setTicking: (ticking: boolean) => void;
     setTime: (time: number[]) => void;
+    isTimeSame: (time: number) => boolean;
     changeState: () => void;
 }
 
-const useTimeStore = create<timeStamp>((set) =>({
+const useTimeStore = create<timeStamp>((set, get) =>({
     time: [0, 0, 0],
     state: 0,
     timeStamp: 0,
@@ -29,6 +30,7 @@ const useTimeStore = create<timeStamp>((set) =>({
     setTime: ((time: number[]) => set(() =>({
         time: time
     }))),
+    isTimeSame: ((time: number) => get().time[0] == time),
     changeState: () => set((state)=> ({
         state: state.state == 2? 0: state.state + 1,
         timeStamp: state.time[state.state  == 2? 0: state.state + 1] * 60 * 1000
