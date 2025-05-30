@@ -11,6 +11,7 @@ import {
 import useStickerStore from "@/store/stickerStore";
 import { useEffect, useState } from "react";
 import { Textarea } from "./ui/textarea";
+import useTimeStore from "@/store/timeStore";
 
 export default function Settings() {
 
@@ -19,6 +20,12 @@ export default function Settings() {
 
     const [sticker, setSticker] = useState("");
 
+    const {setTimeStamp, setTicking} = useTimeStore();
+
+    const [ft, setFT] = useState(0);
+    const [sb, setSB] = useState(0);
+    const [lb, setLB] = useState(0);
+
 
     function close() {
         toggle()
@@ -26,8 +33,17 @@ export default function Settings() {
 
     useEffect(() => {
         const curSticker = localStorage.getItem("sticker_pack") ?? "16377";
-        setSticker(curSticker)
-        setActiveId(curSticker)
+        setSticker(curSticker);
+        setActiveId(curSticker);
+
+
+        const ft = parseInt(localStorage.getItem("focus_timer") ?? "13");
+
+        setTimeStamp(ft * 1000 * 60);
+        setFT(ft);
+        setSB(parseInt(localStorage.getItem("short_break") ?? "5"));
+        setLB(parseInt(localStorage.getItem("long_break") ?? "10"));
+
     }, [])
 
     function changeSticker(id: string) {
@@ -36,8 +52,35 @@ export default function Settings() {
 
     function saveChanges() {
         setActiveId(sticker)
-        localStorage.setItem("sticker_pack", sticker)
+        localStorage.setItem("sticker_pack", sticker);
+
+        setTimeStamp(ft * 1000 * 60);
+        setTicking(false);
+        localStorage.setItem("focus_timer", ft.toString());
+        localStorage.setItem("short_break", sb.toString());
+        localStorage.setItem("long_break",  lb.toString());
         close()
+    }
+
+    function changeFT(time: number){
+        if(time < 1) {
+            time = 1
+        }
+        setFT(time)
+    }
+
+    function changeSB(time: number){
+        if(time < 1) {
+            time = 1
+        }
+        setSB(time)
+    }
+
+    function changeLB(time: number){
+        if(time < 1) {
+            time = 1
+        }
+        setLB(time)
     }
 
     return (
@@ -60,7 +103,7 @@ export default function Settings() {
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <div className="cursor-pointer hover:bg-rose-200 rounded p-1">
+                                    <div onClick={close} className="cursor-pointer hover:bg-rose-200 rounded p-1">
                                         <IconX size={18} />
                                     </div>
                                 </TooltipTrigger>
@@ -101,17 +144,23 @@ export default function Settings() {
                         <div className="flex justify-between gap-2 w-full">
                             <div className="w-full">
                                 <small className="font-semibold">Focus Timer</small>
-                                <input type="number" name="" id="" className="bg-gray-200 rounded p-1 w-full mt-1" />
+                                <input type="number" onChange={(event)=>{
+                                    changeFT(parseInt(event.target.value));
+                                }} defaultValue={ft} id="foucs_timer" className="bg-gray-200 rounded p-1 w-full mt-1" />
                                 <small className="">minutes</small>
                             </div>
                             <div className="w-full">
                                 <small className="font-semibold">Short Breaks</small>
-                                <input type="number" name="" id="" className="bg-gray-200 rounded p-1 w-full mt-1" />
+                                <input type="number" onChange={(event)=>{
+                                    changeSB(parseInt(event.target.value));
+                                }} defaultValue={sb} id="short_break" className="bg-gray-200 rounded p-1 w-full mt-1" />
                                 <small className="">minutes</small>
                             </div>
                             <div className="w-full">
                                 <small className="font-semibold">Long Breaks</small>
-                                <input type="number" name="" id="" className="bg-gray-200 rounded p-1 w-full mt-1" />
+                                <input type="number" onChange={(event)=>{
+                                    changeLB(parseInt(event.target.value));
+                                }} defaultValue={lb} id="long_break" className="bg-gray-200 rounded p-1 w-full mt-1" />
                                 <small className="">minutes</small>
                             </div>
                         </div>
@@ -136,7 +185,7 @@ export default function Settings() {
                                 <a href="/" target="_blank" className="text-amber-800 border-b border-amber-600">Link</a>
                             </div>
 
-                            <Textarea placeholder="Add custom theme" className="text-black mt-4 resize-none" />
+                            <Textarea placeholder="Add custom theme" className="text-black mt-4 resize-none h-40" />
                         </div>
                     </div>
                 }>

@@ -1,5 +1,5 @@
 import useTimeStore from "@/store/timeStore";
-import  { useState, useEffect, useRef } from "react";
+import  { useEffect, useRef } from "react";
 
 
 
@@ -23,7 +23,7 @@ const formatTime = (time: number) => {
 
 const CountDownTimer = () => {
 
-    const {timeStamp, setTimeStamp, ticking} = useTimeStore();
+    const {timeStamp, ticking, changeState, setTimeStamp} = useTimeStore();
 
     const countdownTimer = useRef<NodeJS.Timeout>(null);
 
@@ -31,9 +31,10 @@ const CountDownTimer = () => {
     useEffect(()=>{ 
         if(ticking) {
             countdownTimer.current = setTimeout(() => {
-                const new_time = timeStamp - 1000
-                if (new_time <= 0) {
-                    clearCountdown();
+                const new_time = timeStamp - 1000;
+                if (new_time < 0) {
+                    //TODO: make sound to alert.
+                    changeState();
                     return
                 }
     
@@ -50,8 +51,6 @@ const CountDownTimer = () => {
     }
 
     useEffect(() => {
-        
-
         return () => {
             clearCountdown();
         };
