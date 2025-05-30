@@ -15,6 +15,10 @@ interface stickerStoreInterface {
 
 const useStickerStore = create<stickerStoreInterface>((set, get) => ({
     stickers: {
+         "1": {
+            id: "1",
+            name: "Meme"
+        },
         "16377": {
             id: "16377",
             name: "Hedgehog"
@@ -32,7 +36,7 @@ const useStickerStore = create<stickerStoreInterface>((set, get) => ({
             name: "Cute Dugong"
         }
     },
-    activeId: "16377",
+    activeId: "161377",
     setActiveId: (id: string) => set(() => ({
         activeId: id
     }))
