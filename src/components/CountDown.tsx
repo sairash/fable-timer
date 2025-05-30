@@ -1,66 +1,71 @@
 import useTimeStore from "@/store/timeStore";
-import  { useEffect, useRef } from "react";
-
-
+import { useEffect, useRef } from "react";
 
 const formatTime = (time: number) => {
-    const seconds = Math.floor((time / 1000) % 60);
-    const minutes = Math.floor((time / (1000 * 60)) % 60);
+  const seconds = Math.floor((time / 1000) % 60);
+  const minutes = Math.floor((time / (1000 * 60)) % 60);
 
-    return (
-        <div className="flex gap-4">
-            <div className="countdown-value">
-                {minutes.toString().padStart(2, "0")}
-            </div>
-            <div className="seperator">:</div>
-            <div className="countdown-value">
-                {seconds.toString().padStart(2, "0")}
-            </div>
-        </div>
-    );
+  return (
+    <div className="flex gap-4">
+      <div className="countdown-value">
+        {minutes.toString().padStart(2, "0")}
+      </div>
+      <div className="seperator">:</div>
+      <div className="countdown-value">
+        {seconds.toString().padStart(2, "0")}
+      </div>
+    </div>
+  );
 };
 
-
 const CountDownTimer = () => {
+  const { timeStamp, ticking, changeState, setTimeStamp } = useTimeStore();
+  const countdownTimer = useRef<number | null>(null);
+  const lastUpdateRef = useRef<number>(Date.now());
+  const stateRef = useRef<number>(0);
 
-    const {timeStamp, ticking, changeState, setTimeStamp} = useTimeStore();
+  // Track current state to detect changes
+  useEffect(() => {
+    stateRef.current = useTimeStore.getState().state;
+  }, [timeStamp]);
 
-    const countdownTimer = useRef<NodeJS.Timeout>(null);
+  function clearCountdown() {
+    if (countdownTimer.current !== null) {
+      clearInterval(countdownTimer.current);
+      countdownTimer.current = null;
+    }
+  }
 
+  useEffect(() => {
+    if (ticking) {
+      lastUpdateRef.current = Date.now();
+      clearCountdown();
 
-    useEffect(()=>{ 
-        if(ticking) {
-            countdownTimer.current = setTimeout(() => {
-                const new_time = timeStamp - 1000;
-                if (new_time < 0) {
-                    //TODO: make sound to alert.
-                    changeState();
-                    return
-                }
-    
-                setTimeStamp(new_time);
-            }, 1000);
-        }else{
-            clearCountdown()
+      countdownTimer.current = window.setInterval(() => {
+        const now = Date.now();
+        const elapsed = now - lastUpdateRef.current;
+        lastUpdateRef.current = now;
+
+        const currentTime = useTimeStore.getState().timeStamp;
+        const newTime = currentTime - elapsed;
+
+        if (newTime <= 0) {
+          lastUpdateRef.current = Date.now();
+          changeState();
+        } else {
+          setTimeStamp(newTime);
         }
-    }, [ticking, timeStamp])
-
-    function clearCountdown(){
-        if(!countdownTimer.current) return;
-        clearTimeout(countdownTimer.current);
+      }, 1000);
+    } else {
+      clearCountdown();
     }
 
-    useEffect(() => {
-        return () => {
-            clearCountdown();
-        };
-    }, [timeStamp])
+    return () => {
+      clearCountdown();
+    };
+  }, [ticking, changeState, setTimeStamp]);
 
-    return (
-        <div className="">
-            {formatTime(timeStamp)}
-        </div>
-    )
-}
+  return <div className="">{formatTime(timeStamp)}</div>;
+};
 
 export default CountDownTimer;
