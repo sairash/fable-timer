@@ -4,7 +4,7 @@ import useTimeStore from "@/store/timeStore";
 
 const CountDownContainer = () => {
 
-    const {setTimeStamp}= useTimeStore();
+    const {state, setTimeStamp}= useTimeStore();
 
     useEffect(()=>{
         setTimeStamp(12 * 60 * 1000);
@@ -13,7 +13,7 @@ const CountDownContainer = () => {
     return (
         <div className="min-w-xs ">
             <div className="text-center mb-5 text-4xl">
-                Focus Timer
+                {state == 0 || state == 1? state == 0? "Focus Timer": "Short Break": "Long Break"}
             </div>
             <div className="flex justify-center p-2 w-full h-full school">
                 <div className="p-2 text-7xl">
