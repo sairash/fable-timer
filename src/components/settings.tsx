@@ -41,7 +41,7 @@ export default function Settings() {
         const sb = parseInt(localStorage.getItem("short_break") ?? "5");
         const lb = parseInt(localStorage.getItem("long_break") ?? "10")
 
-        setTimeStamp(ft * 1000 );
+        setTimeStamp(ft * 1000 * 60 );
         setFT(ft);
         setSB(sb);
         setLB(lb);
@@ -169,6 +169,7 @@ export default function Settings() {
                                 <small className="">minutes</small>
                             </div>
                         </div>
+                        <hr className="mt-2" />
                         <div className="mt-4 text-sm mb-2 font-semibold">Sticker Pack: </div>
                         <div className="flex h-30">
                             <img src={`/sticker/${sticker}/choose.gif`} className="w-30" alt="" />
@@ -183,6 +184,7 @@ export default function Settings() {
                                 </select>
                             </div>
                         </div>
+                        <hr className="mt-2" />
                         <div className="mt-4 text-sm mb-8">
                             <div className="font-semibold mb-2">Custom Theme:</div>
                             <div className="">
