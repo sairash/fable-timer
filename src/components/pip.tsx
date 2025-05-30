@@ -95,7 +95,7 @@ const PictureInPictureDiv = () => {
       } catch (error) {
         console.error('Error capturing div:', error);
       }
-    }, 10)
+    }, 0)
   };
 
 
