@@ -1,4 +1,4 @@
-import { JSX, useEffect } from "react";
+import { JSX, useCallback, useEffect } from "react";
 import {
     Tooltip,
     TooltipContent,
@@ -8,14 +8,16 @@ import {
 
 import {
     IconMusic,
-    IconPictureInPicture,
     IconPictureInPictureOff,
     IconPictureInPictureOn,
     IconPlayerPause, IconPlayerPlay, IconSettings
 } from "@tabler/icons-react";
+import useModalStore from "@/store/modalStore";
 
 
 const ControlButtons = ({ btnEvent, activeButtons }: { btnEvent: (data: string, close: boolean) => void, activeButtons: string[] }) => {
+    const {open} = useModalStore();
+
     const obj_button: Record<string, JSX.Element> = {
         "play": <TooltipProvider key="play">
             <Tooltip>
@@ -105,29 +107,34 @@ const ControlButtons = ({ btnEvent, activeButtons }: { btnEvent: (data: string, 
         </TooltipProvider>
     }
 
-    // Event listeners
-    useEffect(() => {
-        document.addEventListener("keydown", (ev) => {
-            switch (ev.code) {
-                case "Space":
-                    btnEvent("play", true);
-                    break;
-                case "KeyM":
-                    btnEvent("music", false);
-                    break;
-                case "KeyP":
-                    btnEvent("pip", false);
-                case "KeyS":
-                    btnEvent("settings", false)
-                default:
-                    break;
-            }
-        })
 
-        return (
-            document.removeEventListener("keydown", (ev) => { })
-        )
-    }, [])
+    const handleKeyDown = useCallback((ev: KeyboardEvent) => {
+        if(open){
+            return
+        }
+        switch (ev.code) {
+            case "Space":
+                btnEvent("play", true);
+                break;
+            case "KeyM":
+                btnEvent("music", false);
+                break;
+            case "KeyP":
+                btnEvent("pip", false);
+            case "KeyS":
+                btnEvent("settings", false)
+            default:
+                break;
+        }
+    }, [btnEvent,open]);
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [handleKeyDown]);
 
 
     return (

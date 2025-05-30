@@ -1,3 +1,4 @@
+import useModalStore from "@/store/modalStore";
 import {ReactNode, useCallback, useEffect} from "react";
 
 
@@ -12,6 +13,8 @@ interface ModalProps {
 
 function modal({close, title, headerContent, bodyContent}: ModalProps) {
 
+    const {setOpen} = useModalStore()
+
     const handleKeyDown = useCallback((event: KeyboardEvent) => {
         if (event.key === 'Escape') {
             close();
@@ -25,6 +28,15 @@ function modal({close, title, headerContent, bodyContent}: ModalProps) {
             document.removeEventListener('keydown', handleKeyDown);
         }
     }, [handleKeyDown]);
+
+
+    useEffect(()=>{
+        setOpen(true);
+
+        return () =>{
+            setOpen(false);
+        }
+    }, [])
 
     return (
         <>
