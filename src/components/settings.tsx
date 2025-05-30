@@ -20,7 +20,7 @@ export default function Settings() {
 
     const [sticker, setSticker] = useState("");
 
-    const {isTimeSame, setTimeStamp, setTicking} = useTimeStore();
+    const {setTime, setTimeStamp, setTicking} = useTimeStore();
 
     const [ft, setFT] = useState(0);
     const [sb, setSB] = useState(0);
@@ -38,11 +38,15 @@ export default function Settings() {
 
 
         const ft = parseInt(localStorage.getItem("focus_timer") ?? "13");
+        const sb = parseInt(localStorage.getItem("short_break") ?? "5");
+        const lb = parseInt(localStorage.getItem("long_break") ?? "10")
 
-        setTimeStamp(ft * 1000 * 60);
+        setTimeStamp(ft * 1000 );
         setFT(ft);
-        setSB(parseInt(localStorage.getItem("short_break") ?? "5"));
-        setLB(parseInt(localStorage.getItem("long_break") ?? "10"));
+        setSB(sb);
+        setLB(lb);
+
+        setTime([ft, sb, lb])
 
     }, [])
 
@@ -54,10 +58,8 @@ export default function Settings() {
         setActiveId(sticker)
         localStorage.setItem("sticker_pack", sticker);
 
-        if(isTimeSame(ft)){
-            setTimeStamp(ft * 1000 * 60);
-            setTicking(false);
-        }
+        setTimeStamp(ft * 1000 * 60);
+        setTicking(false);
 
         localStorage.setItem("focus_timer", ft.toString());
         localStorage.setItem("short_break", sb.toString());
