@@ -11,20 +11,35 @@ import {
 
 import useMusicModalStore from "@/store/musicStore";
 import Modal from "@/components/custom-ui/modal";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useTimeStore from "@/store/timeStore";
+import { useYoutube } from "react-youtube-music-player";
+import { Input } from "./ui/input";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 
 
-type VolumeLevel = "mute" | "50" | "75" | "100"
+type VolumeLevel = 0 | 50 | 75 | 100
 
 function MusicModal() {
     const { open, pauseWithTimer, togglePauseWithTimer, audios, active, toggleActive, isActive, toggle } = useMusicModalStore();
     const { ticking } = useTimeStore();
     const [isPlaying, setIsPlaying] = useState(false)
-    const [volumeLevel, setVolumeLevel] = useState<VolumeLevel>("75")
+    const [volumeLevel, setVolumeLevel] = useState<VolumeLevel>(75);
+    const [isYoutubeModalActive, setIsYoutubeModalActive] = useState(false);
+    const isReadyYoutube = useRef(false); 
 
-    const volumeOptions: VolumeLevel[] = ["mute", "50", "75", "100"]
+    const { playerDetails, actions } = useYoutube({
+        id: "RDATmXfcbG9maQ",
+        type: "playlist",
+        events: {
+            onReady() {
+                isReadyYoutube.current = true;
+            },
+        }
+    });
+
+    const volumeOptions: VolumeLevel[] = [0, 50, 75, 100]
 
     const cycleVolume = () => {
         const currentIndex = volumeOptions.indexOf(volumeLevel)
@@ -34,9 +49,9 @@ function MusicModal() {
 
     const getVolumeIcon = () => {
         switch (volumeLevel) {
-            case "mute":
+            case 0:
                 return <IconVolumeOff className="h-3.5 w-3.5" />
-            case "50":
+            case 50:
                 return <IconVolume2 className="h-3.5 w-3.5" />
             default:
                 return <IconVolume className="h-3.5 w-3.5" />
@@ -59,38 +74,67 @@ function MusicModal() {
         });
     }, [ticking, pauseWithTimer, active, audios, isActive]);
 
-    const getVolumeDisplay = () => {
-        return volumeLevel === "mute" ? "0%" : `${volumeLevel}%`
+
+    useEffect(()=>{
+        if(!isReadyYoutube.current){
+            return
+        }
+
+        if(isPlaying){
+            actions.playVideo()
+            return
+        }
+
+        actions.pauseVideo();
+    }, [isPlaying])
+
+    function next(){
+        actions.nextVideo()
     }
+
+    function prev(){
+        actions.previousVideo()
+    }
+
+    useEffect(()=>{
+        if(isReadyYoutube.current){
+            actions.setVolume(volumeLevel)
+        }
+    }, [volumeLevel])
 
 
     function toggleMusic() {
         toggle()
     }
 
+    function toggleIsYoutubeActive(){
+        setIsYoutubeModalActive(prev => !prev)
+    }
+
     return (
         <>
-            <div className="bg-white w-64 h-20 fixed top-5 left-5 ">
+            <div className="bg-white w-64 h-20 fixed top-5 left-5">
                 <div className="w-64 bg-white rounded-xl shadow-xl border border-purple-500/20 p-3 backdrop-blur-md">
                     <div className="flex items-center gap-2.5">
                         <div className="relative flex-shrink-0 group">
                             <img
-                                src="https://img.youtube.com/vi/PxWleEgi3Hw/default.jpg"
+                                src={`https://img.youtube.com/vi/${playerDetails.id}/default.jpg`}
                                 alt="Album cover"
                                 className="w-12 h-12 rounded object-cover shadow-lg ring-1 ring-white/10"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
 
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 ">
                             <div className="mb-1.5 flex justify-between gap-1">
-                                <h3 className="text-sm text-black truncate leading-tight mt-1">Who am I to say - Hope | ortoPilot Cover</h3>
-                                <div className="cursor-pointer hover:bg-black rounded hover:text-white p-1"><IconSearch size={16} /></div>
+                                <h3 className="text-sm text-black truncate leading-tight mt-1">{playerDetails.title}</h3>
+                                <div className="cursor-pointer hover:bg-black rounded hover:text-white p-1" onClick={toggleIsYoutubeActive}><IconSearch size={16} /></div>
                             </div>
 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-1">
                                     <button
+                                        onClick={prev}
                                         className="cursor-pointer text-black hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-white/10"
                                         aria-label="Previous track"
                                     >
@@ -106,6 +150,7 @@ function MusicModal() {
                                     </button>
 
                                     <button
+                                        onClick={next}
                                         className="cursor-pointer text-black hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-white/10"
                                         aria-label="Next track"
                                     >
@@ -116,11 +161,11 @@ function MusicModal() {
                                 <button
                                     onClick={cycleVolume}
                                     className="cursor-pointer flex items-center gap-1.5 text-black hover:text-gray-700 transition-colors p-1.5 rounded-lg hover:bg-white/10 group"
-                                    aria-label={`Volume: ${getVolumeDisplay()}`}
+                                    aria-label={`Volume: ${volumeLevel}%`}
                                 >
                                     {getVolumeIcon()}
                                     <span className="text-xs font-medium min-w-[24px] text-right group-hover:text-black">
-                                        {getVolumeDisplay()}
+                                        {volumeLevel} %
                                     </span>
                                 </button>
                             </div>
@@ -128,6 +173,30 @@ function MusicModal() {
                     </div>
                 </div>
             </div>
+
+           {isYoutubeModalActive && (
+                <Modal title="Youtube Music" close={toggleIsYoutubeActive} bodyContent={
+                    <div className="p-2">
+                        <label className="text-sm font-semibold" htmlFor="url_yb">Youtube Link:</label>
+                        <Input type="text" placeholder="Enter url here" id="url_yb" className="text-black mt-2"/>
+
+                        <div className="mt-2">
+                            <label className="text-sm font-semibold" htmlFor="url_yb">Link Type:</label>
+                            <RadioGroup defaultValue="playlist" className="mt-3">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="playlist" id="playlist" className="cursor-pointer" />
+                                    <label htmlFor="playlist" className=" text-sm cursor-pointer">Playlist</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="video" id="video" className="cursor-pointer" />
+                                    <label htmlFor="video" className="text-sm cursor-pointer">Video</label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    </div>
+                } /> 
+           )}
+
             {open && (<Modal title="Music" close={toggleMusic}
                 headerContent={
                     <TooltipProvider>
