@@ -53,14 +53,14 @@ function getYouTubeTypeAndId(urlString: string): [videoType, string] {
 }
 
 function MusicModal() {
-    const { youtubeUrl, setYoutubeUrl, open, pauseWithTimer, togglePauseWithTimer, audios, active, toggleActive, isActive, toggle } = useMusicModalStore();
-    const { ticking } = useTimeStore();
+    const { youtubeUrl, alertAudio, setYoutubeUrl, open, pauseWithTimer, togglePauseWithTimer, audios, active, toggleActive, isActive, toggle } = useMusicModalStore();
+    const { state, ticking } = useTimeStore();
     const [isYoutubeModalActive, setIsYoutubeModalActive] = useState(false);
     const [youtubeUrlModalState, setYoutubeUrlModalState] = useState("https://www.youtube.com/watch?v=iuT8KImN-Rk&list=RDATmXfcbG9maQ");
     const [youtubeUrlIdAndType, setYoutubeUrlIdAndType] = useState<[videoType, string]>(defaultYoutubeThing);
+    const [alert, setAlert] = useState(false);
 
     
-
     
     useEffect(() => {
         Object.entries(audios).forEach(([key, element]) => {
@@ -68,7 +68,7 @@ function MusicModal() {
             const audio = element.music;
 
             if (audio) {
-                if (isCurrentlyActive && !((!ticking && pauseWithTimer))) {
+                if (isCurrentlyActive && !((!ticking && pauseWithTimer)) && !alert) {
                     audio.play().catch(e => console.error("Error playing audio:", e));
                 } else {
                     audio.pause();
@@ -76,8 +76,22 @@ function MusicModal() {
                 }
             }
         });
-    }, [ticking, pauseWithTimer, active, audios, isActive]);
+    }, [ticking, pauseWithTimer, active, audios, alert, isActive]);
 
+
+    useEffect(()=>{
+        if(!alertAudio || !ticking) return;
+
+        setAlert(true);
+        alertAudio.play();
+
+        setTimeout(()=>{
+            setAlert(false)
+            alertAudio.pause();
+            alertAudio.currentTime = 0;
+        }, 1500);
+
+    }, [state, ticking])
 
     useEffect(() => {
         setYoutubeUrlModalState(youtubeUrl);
@@ -103,7 +117,7 @@ function MusicModal() {
     return (
         <>
             
-            <YoutubeMusicComponent idAndType={youtubeUrlIdAndType} open={toggleIsYoutubeActive} />
+            <YoutubeMusicComponent idAndType={youtubeUrlIdAndType} alert={alert} open={toggleIsYoutubeActive} />
             {isYoutubeModalActive && (
                 <Modal title="Youtube Music" close={toggleIsYoutubeActive}
                     headerContent={

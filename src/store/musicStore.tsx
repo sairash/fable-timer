@@ -19,6 +19,7 @@ interface Audios {
 interface MusicModalState {
     open: boolean;
     youtubeUrl: string;
+    alertAudio: HTMLAudioElement|null;
     active: string[];
     pauseWithTimer: boolean,
     audios: Record<string, Audios>;
@@ -43,6 +44,7 @@ const createAudioElement = (src: string): HTMLAudioElement | null => {
 const useMusicModalStore = create<MusicModalState>((set, get) => ({
     open: false,
     youtubeUrl: "https://www.youtube.com/watch?v=iuT8KImN-Rk&list=RDATmXfcbG9maQ",
+    alertAudio: createAudioElement('/alerts/chime.mp3'),
     pauseWithTimer: true,
     audios: {
         "wind": {

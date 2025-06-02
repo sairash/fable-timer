@@ -9,7 +9,7 @@ type VolumeLevel = 0 | 50 | 75 | 100
 type videoType = "playlist" | "video";
 
 
-function YoutubeMusicComponent({ idAndType, open }: { idAndType: [videoType, string], open: () => void }) {
+function YoutubeMusicComponent({ idAndType, alert, open }: { idAndType: [videoType, string], alert: boolean, open: () => void }) {
     const [volumeLevel, setVolumeLevel] = useState<VolumeLevel>(75);
     const [isPlaying, setIsPlaying] = useState(false)
 
@@ -30,6 +30,10 @@ function YoutubeMusicComponent({ idAndType, open }: { idAndType: [videoType, str
     useEffect(()=>{
         setIsPlaying(false);
     }, [idAndType])
+
+    useEffect(()=>{
+        setIsPlaying(!alert && isPlaying)
+    }, [alert, isPlaying])
 
 
     useEffect(() => {
