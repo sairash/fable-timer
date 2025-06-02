@@ -1,5 +1,5 @@
 import { cx } from "class-variance-authority";
-import { IconClockPause, IconMusic, IconPlayerPauseFilled, IconPlayerPlayFilled, IconPlayerSkipBackFilled, IconPlayerSkipForwardFilled, IconSearch, IconVolume, IconVolume2, IconVolumeOff } from "@tabler/icons-react";
+import { IconCheck, IconClockPause, IconMusic, IconPlayerPauseFilled, IconPlayerPlayFilled, IconPlayerSkipBackFilled, IconPlayerSkipForwardFilled, IconSearch, IconVolume, IconVolume2, IconVolumeOff, IconX } from "@tabler/icons-react";
 import Switch from "@/components/custom-ui/Switch"
 
 import {
@@ -15,49 +15,53 @@ import { useEffect, useRef, useState } from "react";
 import useTimeStore from "@/store/timeStore";
 import { useYoutube } from "react-youtube-music-player";
 import { Input } from "./ui/input";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import YoutubeMusicComponent from "./YoutubeMusicComponent";
+import { toast } from "sonner"
 
 
+type videoType = "playlist" | "video";
+const defaultYoutubeThing: [videoType, string]= ["playlist", "RDATmXfcbG9maQ"];
 
-type VolumeLevel = 0 | 50 | 75 | 100
+
+function getYouTubeTypeAndId(urlString: string): [videoType, string] {
+    let url: URL;
+    try {
+        url = new URL(urlString);
+    } catch (e) {
+        toast('Invalid URL');
+        return defaultYoutubeThing;
+    }
+    
+    const host = url.hostname.replace(/^www\./, '');
+    if(!(host === 'youtu.be' || host === 'youtube.com' || host.endsWith('.youtube.com'))){
+        toast('Unsupported YouTube URL format');
+        return defaultYoutubeThing;
+    }
+
+    const params = url.searchParams;
+    const listId = params.get('list');
+    if (listId) {
+        return ['playlist', listId];
+    }
+
+    const videoIdParam = params.get('v');
+    if (videoIdParam) {
+        return ['video', videoIdParam];
+    }
+
+    return defaultYoutubeThing;
+}
 
 function MusicModal() {
-    const { open, pauseWithTimer, togglePauseWithTimer, audios, active, toggleActive, isActive, toggle } = useMusicModalStore();
+    const { youtubeUrl, setYoutubeUrl, open, pauseWithTimer, togglePauseWithTimer, audios, active, toggleActive, isActive, toggle } = useMusicModalStore();
     const { ticking } = useTimeStore();
-    const [isPlaying, setIsPlaying] = useState(false)
-    const [volumeLevel, setVolumeLevel] = useState<VolumeLevel>(75);
     const [isYoutubeModalActive, setIsYoutubeModalActive] = useState(false);
-    const isReadyYoutube = useRef(false); 
+    const [youtubeUrlModalState, setYoutubeUrlModalState] = useState("https://www.youtube.com/watch?v=iuT8KImN-Rk&list=RDATmXfcbG9maQ");
+    const [youtubeUrlIdAndType, setYoutubeUrlIdAndType] = useState<[videoType, string]>(defaultYoutubeThing);
 
-    const { playerDetails, actions } = useYoutube({
-        id: "RDATmXfcbG9maQ",
-        type: "playlist",
-        events: {
-            onReady() {
-                isReadyYoutube.current = true;
-            },
-        }
-    });
+    
 
-    const volumeOptions: VolumeLevel[] = [0, 50, 75, 100]
-
-    const cycleVolume = () => {
-        const currentIndex = volumeOptions.indexOf(volumeLevel)
-        const nextIndex = (currentIndex + 1) % volumeOptions.length
-        setVolumeLevel(volumeOptions[nextIndex])
-    }
-
-    const getVolumeIcon = () => {
-        switch (volumeLevel) {
-            case 0:
-                return <IconVolumeOff className="h-3.5 w-3.5" />
-            case 50:
-                return <IconVolume2 className="h-3.5 w-3.5" />
-            default:
-                return <IconVolume className="h-3.5 w-3.5" />
-        }
-    }
-
+    
     useEffect(() => {
         Object.entries(audios).forEach(([key, element]) => {
             const isCurrentlyActive = isActive(element.title);
@@ -75,127 +79,77 @@ function MusicModal() {
     }, [ticking, pauseWithTimer, active, audios, isActive]);
 
 
-    useEffect(()=>{
-        if(!isReadyYoutube.current){
-            return
-        }
+    useEffect(() => {
+        setYoutubeUrlModalState(youtubeUrl);
+        setIsYoutubeModalActive(false);
 
-        if(isPlaying){
-            actions.playVideo()
-            return
-        }
+        setYoutubeUrlIdAndType(getYouTubeTypeAndId(youtubeUrl));
 
-        actions.pauseVideo();
-    }, [isPlaying])
+    }, [youtubeUrl, useYoutube, setIsYoutubeModalActive])
 
-    function next(){
-        actions.nextVideo()
+    function saveChanges() {
+        setIsYoutubeModalActive(false);
+        setYoutubeUrl(youtubeUrlModalState)
     }
-
-    function prev(){
-        actions.previousVideo()
-    }
-
-    useEffect(()=>{
-        if(isReadyYoutube.current){
-            actions.setVolume(volumeLevel)
-        }
-    }, [volumeLevel])
-
 
     function toggleMusic() {
         toggle()
     }
 
-    function toggleIsYoutubeActive(){
+    function toggleIsYoutubeActive() {
         setIsYoutubeModalActive(prev => !prev)
     }
 
     return (
         <>
-            <div className="bg-white w-64 h-20 fixed top-5 left-5">
-                <div className="w-64 bg-white rounded-xl shadow-xl border border-purple-500/20 p-3 backdrop-blur-md">
-                    <div className="flex items-center gap-2.5">
-                        <div className="relative flex-shrink-0 group">
-                            <img
-                                src={`https://img.youtube.com/vi/${playerDetails.id}/default.jpg`}
-                                alt="Album cover"
-                                className="w-12 h-12 rounded object-cover shadow-lg ring-1 ring-white/10"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            
+            <YoutubeMusicComponent idAndType={youtubeUrlIdAndType} open={toggleIsYoutubeActive} />
+            {isYoutubeModalActive && (
+                <Modal title="Youtube Music" close={toggleIsYoutubeActive}
+                    headerContent={
+                        <div className="flex gap-2">
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <div onClick={toggleIsYoutubeActive} className="cursor-pointer hover:bg-rose-200 rounded p-1">
+                                            <IconX size={18} />
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="left" style={{ zIndex: 1000 }}>
+                                        <p className="py-1">Cancel Changes</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <div className="cursor-pointer hover:bg-amber-200 rounded p-1" onClick={saveChanges}>
+                                            <IconCheck size={18} />
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="left" style={{ zIndex: 1000 }}>
+                                        <p className="py-1">Save Changes</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         </div>
+                    }
+                    bodyContent={
+                        <div className="p-2">
+                            <label className="text-sm font-semibold" htmlFor="url_yb">Youtube Link:</label>
+                            <Input onChange={(event) => {
+                                setYoutubeUrlModalState(event.target.value)
+                            }} defaultValue={youtubeUrlModalState} type="text" placeholder="Enter url here" id="url_yb" className="text-black mt-2" />
 
-                        <div className="flex-1 min-w-0 ">
-                            <div className="mb-1.5 flex justify-between gap-1">
-                                <h3 className="text-sm text-black truncate leading-tight mt-1">{playerDetails.title}</h3>
-                                <div className="cursor-pointer hover:bg-black rounded hover:text-white p-1" onClick={toggleIsYoutubeActive}><IconSearch size={16} /></div>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        onClick={prev}
-                                        className="cursor-pointer text-black hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-white/10"
-                                        aria-label="Previous track"
-                                    >
-                                        <IconPlayerSkipBackFilled className="h-3.5 w-3.5" />
-                                    </button>
-
-                                    <button
-                                        className="cursor-pointer rounded bg-black p-1 flex items-center justify-center text-white shadow-lg hover:shadow-purple-500/25 transform mx-1"
-                                        onClick={() => setIsPlaying(!isPlaying)}
-                                        aria-label={isPlaying ? "Pause" : "Play"}
-                                    >
-                                        {isPlaying ? <IconPlayerPauseFilled size={17} /> : <IconPlayerPlayFilled size={17} />}
-                                    </button>
-
-                                    <button
-                                        onClick={next}
-                                        className="cursor-pointer text-black hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-white/10"
-                                        aria-label="Next track"
-                                    >
-                                        <IconPlayerSkipForwardFilled className="h-3.5 w-3.5" />
-                                    </button>
-                                </div>
-
-                                <button
-                                    onClick={cycleVolume}
-                                    className="cursor-pointer flex items-center gap-1.5 text-black hover:text-gray-700 transition-colors p-1.5 rounded-lg hover:bg-white/10 group"
-                                    aria-label={`Volume: ${volumeLevel}%`}
-                                >
-                                    {getVolumeIcon()}
-                                    <span className="text-xs font-medium min-w-[24px] text-right group-hover:text-black">
-                                        {volumeLevel} %
-                                    </span>
-                                </button>
+                            <div className="mt-4 text-sm">
+                                <div className="font-semibold">How it works?</div>
+                                <div className="mt-2">Either <span className="font-semibold">video</span> or <span className="font-semibold">playlist</span> can be entered in the input field above. </div>
+                                <div className="mt-2">If your link contains the <span className="bg-green-200 p-1 rounded">&list=</span> it is considered as playlist else it is a video url.</div>
+                                <div className="mt-4 text-gray-600"><span className="font-semibold">Next</span> and <span className="font-semibold">Previous</span> is only available on playlist mode.</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-           {isYoutubeModalActive && (
-                <Modal title="Youtube Music" close={toggleIsYoutubeActive} bodyContent={
-                    <div className="p-2">
-                        <label className="text-sm font-semibold" htmlFor="url_yb">Youtube Link:</label>
-                        <Input type="text" placeholder="Enter url here" id="url_yb" className="text-black mt-2"/>
-
-                        <div className="mt-2">
-                            <label className="text-sm font-semibold" htmlFor="url_yb">Link Type:</label>
-                            <RadioGroup defaultValue="playlist" className="mt-3">
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="playlist" id="playlist" className="cursor-pointer" />
-                                    <label htmlFor="playlist" className=" text-sm cursor-pointer">Playlist</label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="video" id="video" className="cursor-pointer" />
-                                    <label htmlFor="video" className="text-sm cursor-pointer">Video</label>
-                                </div>
-                            </RadioGroup>
-                        </div>
-                    </div>
-                } /> 
-           )}
+                    } />
+            )}
 
             {open && (<Modal title="Music" close={toggleMusic}
                 headerContent={
