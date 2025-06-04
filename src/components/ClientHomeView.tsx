@@ -7,6 +7,7 @@ import MusicModal from "@/components/music"
 import useTimeStore from "@/store/timeStore";
 import Settings from "./settings";
 import useStickerStore from "@/store/stickerStore";
+import TaskContainer from "./TaskContainer";
 
 export default function ClientHomeView() {
     const { ticking } = useTimeStore()
@@ -25,6 +26,7 @@ export default function ClientHomeView() {
             <OnlineUser />
             <MusicModal />
             <Settings />
+            <TaskContainer />
         </div>
     );
 }

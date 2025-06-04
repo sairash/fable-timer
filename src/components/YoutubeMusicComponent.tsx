@@ -93,7 +93,7 @@ function YoutubeMusicComponent({ idAndType, alert, open }: { idAndType: [videoTy
 
 
     return (
-        <div className="bg-white w-64 h-20 fixed top-5 left-5">
+        <div className="bg-white w-64 h-20 fixed top-5 right-5">
             <div className="w-64 bg-white rounded-xl shadow-xl border border-purple-500/20 p-3 backdrop-blur-md">
                 <div className="flex items-center gap-2.5">
                     <div className="relative flex-shrink-0 group">

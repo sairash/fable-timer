@@ -139,7 +139,7 @@ const ControlButtons = ({ btnEvent, activeButtons }: { btnEvent: (data: string, 
 
     return (
         <>
-            <div className="fixed bottom-10 left-[50%]" style={{ transform: `translateX(-50%)` }}>
+            <div className="fixed bottom-16 left-[50%]" style={{ transform: `translateX(-50%)` }}>
                 <div className="flex justify-center gap-1">
                     {activeButtons.map((buttonType) => (
                         obj_button[buttonType]
