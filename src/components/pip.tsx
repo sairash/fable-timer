@@ -5,12 +5,15 @@ import ControlButtons from './ControlButtons';
 import useMusicModalStore from '@/store/musicStore';
 import useTimeStore from '@/store/timeStore';
 import useSettingsStore from '@/store/settingsStore';
+import useTaskStore from '@/store/taskStore';
 
 
 
 const PictureInPictureDiv = () => {
   const { toggle } = useMusicModalStore();
-  const { timeStamp, ticking, toggleTicking } = useTimeStore()
+  const { timeStamp, ticking, toggleTicking } = useTimeStore();
+  const {togglTaskeOpen} = useTaskStore();
+
   const settingsStore = useSettingsStore();
 
 
@@ -160,6 +163,8 @@ const PictureInPictureDiv = () => {
       case "settings":
         settingsStore.toggle();
         break;
+      case "task":
+        togglTaskeOpen();
       default:
         break;
     }

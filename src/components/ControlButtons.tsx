@@ -123,6 +123,8 @@ const ControlButtons = ({ btnEvent, activeButtons }: { btnEvent: (data: string, 
                 btnEvent("pip", false);
             case "KeyS":
                 btnEvent("settings", false)
+            case "KeyT":
+                btnEvent("task", false)
             default:
                 break;
         }

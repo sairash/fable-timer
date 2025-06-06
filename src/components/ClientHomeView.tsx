@@ -23,7 +23,7 @@ export default function ClientHomeView() {
                 <img src={ticking ? `/sticker/${activeId}/active.gif` : `/sticker/${activeId}/idle.gif`} className="w-96" />
             </div>
             <PausePlayFadeEffect isPlaying={ticking} />
-            <OnlineUser />
+            {/* <OnlineUser /> */}
             <MusicModal />
             <Settings />
             <TaskContainer />
