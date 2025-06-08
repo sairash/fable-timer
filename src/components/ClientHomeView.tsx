@@ -8,6 +8,7 @@ import useTimeStore from "@/store/timeStore";
 import Settings from "./settings";
 import useStickerStore from "@/store/stickerStore";
 import TaskContainer from "./TaskContainer";
+import { IconBrandGithub, IconInfoCircle } from "@tabler/icons-react";
 
 export default function ClientHomeView() {
     const { ticking } = useTimeStore()
@@ -27,6 +28,14 @@ export default function ClientHomeView() {
             <MusicModal />
             <Settings />
             <TaskContainer />
+            <div className="flex gap-2 fixed top-3 left-3">
+                <div className="about cursor-pointer rounded p-1 hover:bg-gray-200">
+                    <a href="/about"><IconInfoCircle size={25} /></a>
+                </div>
+                <div className="about cursor-pointer rounded p-1 hover:bg-gray-200">
+                    <a href="http://github.com/sairash/tiktask" target="_blank"><IconBrandGithub size={25} /></a>
+                </div>
+            </div>
         </div>
     );
 }
