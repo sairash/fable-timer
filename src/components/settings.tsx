@@ -64,6 +64,8 @@ export default function Settings() {
         localStorage.setItem("focus_timer", ft.toString());
         localStorage.setItem("short_break", sb.toString());
         localStorage.setItem("long_break",  lb.toString());
+
+        setTime([ft, sb, lb])
         close()
     }
 
