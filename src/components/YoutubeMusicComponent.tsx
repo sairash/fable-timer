@@ -32,7 +32,13 @@ function YoutubeMusicComponent({ idAndType, alert, open }: { idAndType: [videoTy
     }, [idAndType])
 
     useEffect(()=>{
-        setIsPlaying(!alert && isPlaying)
+        if(isPlaying && alert){
+            setIsPlaying(false)
+
+            setTimeout(()=>{
+                setIsPlaying(true)
+            }, 1000)
+        }
     }, [alert, isPlaying])
 
 

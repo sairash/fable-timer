@@ -83,13 +83,14 @@ function MusicModal() {
         if(!alertAudio || !ticking) return;
 
         setAlert(true);
+
         alertAudio.play();
 
         setTimeout(()=>{
             setAlert(false)
             alertAudio.pause();
             alertAudio.currentTime = 0;
-        }, 1500);
+        }, 700);
 
     }, [state, ticking])
 
