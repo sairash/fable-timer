@@ -13,7 +13,8 @@ const CountDownContainer = () => {
     return (
         <div className="min-w-xs ">
             <div className="text-center mb-5 text-4xl">
-                {state == 0 || state == 1? state == 0? "Focus Timer": "Short Break": "Long Break"}
+
+                {state != 8? state % 2 == 0? "Focus Timer": "Short Break": "Long Break"}
             </div>
             <div className="flex justify-center p-2 w-full h-full school">
                 <div className="p-2 text-7xl">
