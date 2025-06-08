@@ -5,8 +5,8 @@ import { Toaster } from "@/components/ui/sonner"
 
 
 export const metadata: Metadata = {
-  title: "Fable Timer",
-  description: "Fable Timer for focused sessions.",
+  title: "TikTask",
+  description: "TikTask for focused sessions.",
 };
 
 export default function RootLayout({
